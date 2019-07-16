@@ -40,6 +40,7 @@ To gather this data, you should use a 3rd party API, such as https://binlist.net
 - Software patterns
 - Performance and number of requests to the 3rd Party API
 - Unit tests.   
+- Create a simple UI for the endpoints and display the output properly.
 
 Create a repository on github for code and make frequent commit as you develop your API.  
 ##### Goodluck  
