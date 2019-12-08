@@ -1,9 +1,11 @@
 package com.phayo.interviewentry.service;
 
+import com.phayo.interviewentry.dto.client_response.CardHitsResponseDto;
 import com.phayo.interviewentry.dto.client_response.CardVerifyPayloadDto;
 import com.phayo.interviewentry.dto.client_response.CardVerifyResponseDto;
 import com.phayo.interviewentry.dto.external_api_response.BinListResponse;
 import com.phayo.interviewentry.exception.InvalidInputException;
+import com.phayo.interviewentry.exception.InvalidPageException;
 import com.phayo.interviewentry.model.CardDetailEntity;
 import com.phayo.interviewentry.model.CardVerificationRequestRecord;
 import com.phayo.interviewentry.repository.CardDetailEntityRepository;
@@ -12,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -189,5 +196,41 @@ public class CardServiceImpl implements CardService {
         saveRequestReturnObject(validCardNumber, binListResponse);
 
         return mapToCardVerifyResponseDto(binListResponse);
+    }
+
+    @Override
+    @Cacheable(value = "logCache", key = "#root.method.name+ '_' +#pageable.pageNumber")
+    public CardHitsResponseDto getCardVerificationRequestRecords(Pageable pageable) throws RuntimeException {
+        CardHitsResponseDto cardHitsResponseDto = new CardHitsResponseDto();
+
+        Page<Map<String, Object>> page = verificationRequestRepository
+                .getVerificationRequestRecordGroupedByCardNumber(pageable);
+
+        if(page == null){
+            log.error("Invalid Page Exception Thrown");
+            throw new InvalidPageException();
+        }
+
+        if(page.getSize() < 1L){
+            log.error("General Runtime Exception Thrown");
+            throw new RuntimeException();
+        }
+
+        log.info("Pageable response checks out");
+        cardHitsResponseDto.setSize(page.getNumber());
+        cardHitsResponseDto.setLimit(page.getSize());
+        cardHitsResponseDto.setSize(page.getTotalElements());
+        if(page.hasContent()){
+            cardHitsResponseDto.setSuccess(true);
+            Map<String, Object> payload = new ConcurrentHashMap<>();
+            for(Map<String, Object> item : page){
+                payload.put(String.valueOf(item.get("cardNumber")), String.valueOf(item.get("count")));
+            }
+            cardHitsResponseDto.setPayload(payload);
+        } else {
+            log.warn("page has no content");
+        }
+
+        return cardHitsResponseDto;
     }
 }
