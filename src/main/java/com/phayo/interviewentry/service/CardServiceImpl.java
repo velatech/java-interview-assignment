@@ -91,6 +91,8 @@ public class CardServiceImpl implements CardService {
                     .setScheme(cardDetailEntity.getScheme() == null ? "" : cardDetailEntity.getScheme());
             cardVerifyResponseDto.getPayload()
                     .setType(cardDetailEntity.getBrand() == null ? "" : cardDetailEntity.getBrand());
+
+            cardVerifyResponseDto.setSuccess(true);
         }
 
         return cardVerifyResponseDto;
@@ -162,7 +164,7 @@ public class CardServiceImpl implements CardService {
      * @param cardNumber validated card number
      * @param binListResponse Response from third-party API
      */
-    @Async
+//    @Async
     @CacheEvict(value = "logCache", allEntries = true)
     public void saveRequestReturnObject(String cardNumber, BinListResponse binListResponse){
         CardDetailEntity cardDetailEntity = mapToCardDetailEntity(cardNumber, binListResponse);

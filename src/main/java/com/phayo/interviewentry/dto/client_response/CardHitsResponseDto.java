@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Data
 public class CardHitsResponseDto {
-    private boolean success = false;
+    private boolean success;
     private int start;
     private int limit;
     private long size;
