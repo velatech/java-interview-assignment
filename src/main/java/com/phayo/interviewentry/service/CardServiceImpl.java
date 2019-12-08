@@ -1,6 +1,9 @@
 package com.phayo.interviewentry.service;
 
 import com.phayo.interviewentry.dto.client_response.CardVerifyResponseDto;
+import com.phayo.interviewentry.exception.InvalidInputException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ public class CardServiceImpl implements CardService {
      * a truncated 6 digit String otherwise.
      */
     private String validateCardNumber(String cardNumber) throws InvalidInputException{
+        private Logger log = LoggerFactory.getLogger(CardServiceImpl.class);
 
         if ( !cardNumber.matches("\\d{6,19}")){
             throw new InvalidInputException("Card Number Input is not valid");
