@@ -1,5 +1,6 @@
 package com.velatech.java_interview_assignment.model;
 
+import com.velatech.java_interview_assignment.utils.CardType;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -25,10 +26,11 @@ public class CardDetail {
 
     private String brand;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private CardType type;
 
     private String country;
-    
+
     private String bank;
 
 }
