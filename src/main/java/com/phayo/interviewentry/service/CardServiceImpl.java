@@ -135,24 +135,12 @@ public class CardServiceImpl implements CardService {
      * @return CardDetailEntity
      */
     private CardDetailEntity mapToCardDetailEntity(String cardNumber, BinListResponse binListResponse){
-//        Bank bank = new Bank();
-//        bank.setCity(binListResponse.getBank() == null ? "" : binListResponse.getBank().getCity());
-//        bank.setName(binListResponse.getBank() == null ? "" : binListResponse.getBank().getName());
-//        bank.setPhone(binListResponse.getBank() == null ? "" : binListResponse.getBank().getPhone());
-//        bank.setUrl(binListResponse.getBank() == null ? "" : binListResponse.getBank().getUrl());
-//
-//        Brand brand = new Brand(binListResponse.getBrand() == null ? "" : binListResponse.getBrand());
-//        CardScheme scheme = new CardScheme(binListResponse.getScheme() == null ? "" : binListResponse.getScheme());
-//
-//        Country country = new Country();
-//        country.setCurrency(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getCurrency());
-//        country.setName(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getName());
 
         CardDetailEntity cardDetailEntity = new CardDetailEntity();
         cardDetailEntity.setCardNumber(cardNumber);
         cardDetailEntity.setCardNumberLength(binListResponse.getNumber() == null ? 0 : binListResponse.getNumber().getLength());
         cardDetailEntity.setBank(binListResponse.getBank() == null ? "" : binListResponse.getBank().getName());
-        cardDetailEntity.setBrand(binListResponse.getBrand() == null ? "" : binListResponse.getBrand());
+        cardDetailEntity.setBrand(binListResponse.getType() == null ? "" : binListResponse.getType());
         cardDetailEntity.setScheme(binListResponse.getScheme() == null ? "" : binListResponse.getScheme());
         cardDetailEntity.setCountry(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getName());
 

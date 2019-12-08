@@ -34,7 +34,6 @@ public class CardController {
                                                            @RequestParam("limit") int limit){
         if(start < 0) throw new InvalidPageException();
         if(start >= 1) start--;
-        log.info(String.valueOf(start));
         return new ResponseEntity<>(cardService.getCardVerificationRequestRecords(PageRequest.of(start, limit)), HttpStatus.OK);
     }
 }
