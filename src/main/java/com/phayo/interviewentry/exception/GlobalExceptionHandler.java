@@ -15,7 +15,8 @@ public class GlobalExceptionHandler {
 
     private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(value = {InvalidInputException.class})
+    @ExceptionHandler(value = {InvalidInputException.class, InvalidPageException.class
+    })
     public ResponseEntity<?> invalidInputException(InvalidInputException ex, WebRequest request){
         logger.error(ex.getMessage());
         CardVerifyResponseDto responseDto = new CardVerifyResponseDto();
