@@ -15,7 +15,11 @@ public class CardController {
 
     @GetMapping("/verify/{cardNumber}")
     public ResponseEntity<CardVerifyResponseDto> verifyCard(@PathVariable String cardNumber){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
+        return new ResponseEntity<>(cardService.executeCardVerification(cardNumber, entity), HttpStatus.OK);
     }
 
     @GetMapping(value = "/stats", params = { "start", "limit" })
