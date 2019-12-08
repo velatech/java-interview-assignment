@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -27,6 +28,9 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     CardDetailEntityRepository cardDetailEntityRepository;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     /**
      * @Params: cardNumber:String
@@ -77,6 +81,37 @@ public class CardServiceImpl implements CardService {
         return cardVerifyResponseDto;
     }
 
+    /**
+     * Transforms BinListResponse object to an object of type CardDetailEntity
+     * @param cardNumber Validated card Number
+     * @param binListResponse Response from third-party API
+     * @return CardDetailEntity
+     */
+    private CardDetailEntity mapToCardDetailEntity(String cardNumber, BinListResponse binListResponse){
+//        Bank bank = new Bank();
+//        bank.setCity(binListResponse.getBank() == null ? "" : binListResponse.getBank().getCity());
+//        bank.setName(binListResponse.getBank() == null ? "" : binListResponse.getBank().getName());
+//        bank.setPhone(binListResponse.getBank() == null ? "" : binListResponse.getBank().getPhone());
+//        bank.setUrl(binListResponse.getBank() == null ? "" : binListResponse.getBank().getUrl());
+//
+//        Brand brand = new Brand(binListResponse.getBrand() == null ? "" : binListResponse.getBrand());
+//        CardScheme scheme = new CardScheme(binListResponse.getScheme() == null ? "" : binListResponse.getScheme());
+//
+//        Country country = new Country();
+//        country.setCurrency(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getCurrency());
+//        country.setName(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getName());
+
+        CardDetailEntity cardDetailEntity = new CardDetailEntity();
+        cardDetailEntity.setCardNumber(cardNumber);
+        cardDetailEntity.setCardNumberLength(binListResponse.getNumber() == null ? 0 : binListResponse.getNumber().getLength());
+        cardDetailEntity.setBank(binListResponse.getBank() == null ? "" : binListResponse.getBank().getName());
+        cardDetailEntity.setBrand(binListResponse.getBrand() == null ? "" : binListResponse.getBrand());
+        cardDetailEntity.setScheme(binListResponse.getScheme() == null ? "" : binListResponse.getScheme());
+        cardDetailEntity.setCountry(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getName());
+
+        return cardDetailEntity;
+    }
+
     @Override
     public CardVerifyResponseDto executeCardVerification(String cardNumber, HttpEntity<?> entity) throws HttpStatusCodeException, InvalidInputException {
         // Validate the card number in the request
@@ -94,5 +129,16 @@ public class CardServiceImpl implements CardService {
             log.info("There was a saved response");
             return mapToCardVerifyResponseDto(savedResponse.get());
         }
+
+        try {
+            response = restTemplate.exchange( binlistURL + "/{validCardNumber}",
+                    HttpMethod.GET, entity, BinListResponse.class, validCardNumber);
+            binListResponse = response.getBody();
+        } catch (HttpStatusCodeException exception){
+            log.error("Error executing request to lookup.binlist.net");
+            throw  exception;
+        }
+
+        saveRequestReturnObject(validCardNumber, binListResponse);
     }
 }
