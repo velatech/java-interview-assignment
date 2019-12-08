@@ -27,3 +27,8 @@
 /config/application.properties
 /config/.env
 !/config/*.example
+
+
+HELP.md
+src/main/resources/application.properties
+!src/main/resources/application.properties.example
