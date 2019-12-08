@@ -84,6 +84,36 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
+     * Transforms the BinList rsponse to the CardVerifyResponseDto which meets our clients expectation
+     * @param binListResponse Object of BinListResponse gotten from Third party API
+     * @return CardVerifyResponseDto
+     */
+    private CardVerifyResponseDto mapToCardVerifyResponseDto(BinListResponse binListResponse){
+        CardVerifyResponseDto cardVerifyResponseDto = new CardVerifyResponseDto();
+        CardVerifyPayloadDto cardVerifyPayloadDto = new CardVerifyPayloadDto();
+
+        if(binListResponse != null){
+            cardVerifyResponseDto.setPayload(cardVerifyPayloadDto);
+            cardVerifyResponseDto
+                    .getPayload()
+                    .setBank(binListResponse.getBank() == null ? "" : binListResponse.getBank().getName());
+
+            cardVerifyResponseDto
+                    .getPayload()
+                    .setScheme(binListResponse.getScheme() == null ? "" : binListResponse.getScheme());
+
+            cardVerifyResponseDto
+                    .getPayload()
+                    .setType(binListResponse.getType() == null ? "" : binListResponse.getType());
+
+            cardVerifyResponseDto.setSuccess(true);
+
+        }
+
+        return cardVerifyResponseDto;
+    }
+
+    /**
      * Transforms BinListResponse object to an object of type CardDetailEntity
      * @param cardNumber Validated card Number
      * @param binListResponse Response from third-party API
@@ -153,6 +183,9 @@ public class CardServiceImpl implements CardService {
             throw  exception;
         }
 
+        // Saves the binlist response to database
         saveRequestReturnObject(validCardNumber, binListResponse);
+
+        return mapToCardVerifyResponseDto(binListResponse);
     }
 }
