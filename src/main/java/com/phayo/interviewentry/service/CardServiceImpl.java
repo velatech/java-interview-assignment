@@ -11,9 +11,11 @@ import com.phayo.interviewentry.repository.CardVerificationRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -110,6 +112,18 @@ public class CardServiceImpl implements CardService {
         cardDetailEntity.setCountry(binListResponse.getCountry() == null ? "" : binListResponse.getCountry().getName());
 
         return cardDetailEntity;
+    }
+
+    /**
+     * Saves the Transform BinList response to the database
+     * @param cardNumber validated card number
+     * @param binListResponse Response from third-party API
+     */
+    @Async
+    @CacheEvict(value = "logCache", allEntries = true)
+    public void saveRequestReturnObject(String cardNumber, BinListResponse binListResponse){
+        CardDetailEntity cardDetailEntity = mapToCardDetailEntity(cardNumber, binListResponse);
+        cardDetailEntityRepository.save(cardDetailEntity);
     }
 
     @Override
