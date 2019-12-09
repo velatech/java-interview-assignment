@@ -118,4 +118,23 @@ public class CardSchemeServiceImpl {
         return cardVerificationResponse;
     }
 
+    /**
+     * This function maps the response from the BinList API to the structure of the database
+     * @param cardNumber:String
+     * @param binListApiResponse: an object instantiated with the BinListApiResponse class
+     * @return the new generated object
+     */
+    private CardDetail mapToCardDetail(String cardNumber, BinListApiResponse binListApiResponse){
+
+        CardDetail cardDetail = new CardDetail();
+        cardDetail.setCardNumber(cardNumber);
+        cardDetail.setCardNumberLength(binListApiResponse.getNumber() == null ? 0 : binListApiResponse.getNumber().getLength());
+        cardDetail.setBank(binListApiResponse.getBank() == null ? "" : binListApiResponse.getBank().getName());
+        cardDetail.setBrand(binListApiResponse.getBrand() == null ? "" : binListApiResponse.getBrand());
+        cardDetail.setScheme(binListApiResponse.getScheme() == null ? "" : binListApiResponse.getScheme());
+        cardDetail.setCountry(binListApiResponse.getCountry() == null ? "" : binListApiResponse.getCountry().getName());
+
+        return cardDetail;
+    }
+
 }
