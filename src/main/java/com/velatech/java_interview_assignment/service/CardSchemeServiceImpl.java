@@ -224,7 +224,7 @@ public class CardSchemeServiceImpl implements CardSchemeService {
             throw new RuntimeException();
         }
 
-        cardStatisticsResponse.setSize(page.getNumber());
+        cardStatisticsResponse.setStart(page.getNumber()+1);
         cardStatisticsResponse.setLimit(page.getSize());
         cardStatisticsResponse.setSize(page.getTotalElements());
         if(page.hasContent()){
@@ -239,6 +239,5 @@ public class CardSchemeServiceImpl implements CardSchemeService {
         }
         return cardStatisticsResponse;
     }
-
 }
 
