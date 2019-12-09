@@ -15,8 +15,8 @@ public class GlobalExceptionHandler {
 
     private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(value = {InvalidInputExceptionHandler.class})
-    public ResponseEntity<?> invalidInputException(InvalidInputExceptionHandler ex, WebRequest request){
+    @ExceptionHandler(value = {InvalidInputException.class})
+    public ResponseEntity<?> invalidInputException(InvalidInputException ex, WebRequest request){
         logger.error(ex.getMessage());
         CardVerificationResponse cardVerificationResponse = new CardVerificationResponse();
         cardVerificationResponse.setSuccess(false);
@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(cardVerificationResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = {InvalidPageExceptionHandler.class})
-    public ResponseEntity<?> invalidInputException(InvalidPageExceptionHandler ex, WebRequest request){
+    @ExceptionHandler(value = {InvalidPageException.class})
+    public ResponseEntity<?> invalidInputException(InvalidPageException ex, WebRequest request){
         logger.error(ex.getMessage());
         CardVerificationResponse cardVerificationResponse = new CardVerificationResponse();
         cardVerificationResponse.setSuccess(false);
