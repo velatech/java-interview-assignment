@@ -21,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -93,6 +92,8 @@ public class CardServiceImpl implements CardService {
                     .setType(cardDetailEntity.getBrand() == null ? "" : cardDetailEntity.getBrand());
 
             cardVerifyResponseDto.setSuccess(true);
+        } else {
+            throw new RuntimeException();
         }
 
         return cardVerifyResponseDto;
@@ -154,7 +155,7 @@ public class CardServiceImpl implements CardService {
      */
 //    @Async
     @CacheEvict(value = "logCache", allEntries = true)
-    public void saveRequestReturnObject(String cardNumber, BinListResponse binListResponse){
+    public void saveBinListResponseToDatabase(String cardNumber, BinListResponse binListResponse){
         CardDetailEntity cardDetailEntity = mapToCardDetailEntity(cardNumber, binListResponse);
         cardDetailEntityRepository.save(cardDetailEntity);
     }
@@ -167,8 +168,6 @@ public class CardServiceImpl implements CardService {
         // Log the request to database
         logCardVerificationRequest(validCardNumber);
 
-        BinListResponse binListResponse = null;
-        ResponseEntity<BinListResponse> response = null;
 
         // Checks if a request has been previously made to the external API and return the saved response
         Optional<CardDetailEntity> savedResponse = cardDetailEntityRepository.findByCardNumber(validCardNumber);
@@ -176,6 +175,9 @@ public class CardServiceImpl implements CardService {
             log.info("There was a saved response");
             return mapToCardVerifyResponseDto(savedResponse.get());
         }
+
+        BinListResponse binListResponse = null;
+        ResponseEntity<BinListResponse> response = null;
 
         try {
             response = restTemplate.exchange( binlistURL + "/{validCardNumber}",
@@ -187,7 +189,7 @@ public class CardServiceImpl implements CardService {
         }
 
         // Saves the binlist response to database
-        saveRequestReturnObject(validCardNumber, binListResponse);
+        saveBinListResponseToDatabase(validCardNumber, binListResponse);
 
         return mapToCardVerifyResponseDto(binListResponse);
     }
@@ -200,14 +202,9 @@ public class CardServiceImpl implements CardService {
         Page<Map<String, Object>> page = verificationRequestRepository
                 .getVerificationRequestRecordGroupedByCardNumber(pageable);
 
-        if(page == null){
+        if(page == null || page.getSize() < 1L){
             log.error("Invalid Page Exception Thrown");
             throw new InvalidPageException();
-        }
-
-        if(page.getSize() < 1L){
-            log.error("General Runtime Exception Thrown");
-            throw new RuntimeException();
         }
 
         log.info("Pageable response checks out");
