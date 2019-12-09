@@ -208,14 +208,14 @@ public class CardServiceImpl implements CardService {
         }
 
         log.info("Pageable response checks out");
-        cardHitsResponseDto.setSize(page.getNumber());
+        cardHitsResponseDto.setStart(page.getNumber() + 1);
         cardHitsResponseDto.setLimit(page.getSize());
         cardHitsResponseDto.setSize(page.getTotalElements());
         if(page.hasContent()){
             cardHitsResponseDto.setSuccess(true);
             Map<String, Object> payload = new ConcurrentHashMap<>();
             for(Map<String, Object> item : page){
-                payload.put(String.valueOf(item.get("cardNumber")), String.valueOf(item.get("count")));
+                payload.put(String.valueOf(item.get("cardNumber")), Integer.valueOf(item.get("count").toString()));
             }
             cardHitsResponseDto.setPayload(payload);
         } else {

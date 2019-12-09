@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/card-scheme")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CardController {
     @Autowired
     CardService cardService;
