@@ -12,5 +12,5 @@ public class CardStatisticsResponse {
     private int start;
     private int limit;
     private long size;
-    private Map<String, Integer> payload;
+    private Map<String, Object> payload;
 }

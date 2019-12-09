@@ -24,6 +24,7 @@
 /nbdist/
 /.nb-gradle/
 
+application.properties
 /config/application.properties
 /config/.env
 !/config/*.example

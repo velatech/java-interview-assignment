@@ -5,6 +5,7 @@ import com.velatech.java_interview_assignment.dto.customer_response.CardStatisti
 import com.velatech.java_interview_assignment.dto.customer_response.CardVerificationPayload;
 import com.velatech.java_interview_assignment.dto.customer_response.CardVerificationResponse;
 import com.velatech.java_interview_assignment.exception.InvalidInputException;
+import com.velatech.java_interview_assignment.exception.InvalidPageException;
 import com.velatech.java_interview_assignment.model.CardDetail;
 import com.velatech.java_interview_assignment.model.CardVerificationRecord;
 import com.velatech.java_interview_assignment.repository.CardDetailRepository;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.data.domain.Pageable;
 
 
 @Service
@@ -191,6 +197,41 @@ public class CardSchemeServiceImpl implements CardSchemeService {
 
         saveRequestReturnObject(validCardNumber, binListApiResponse);
         return mapToCardVerificationResponse(binListApiResponse);
+    }
+
+
+    @Override
+    @Cacheable(value = "cache", key = "#root.method.name+ '_' +#pageable.pageNumber")
+    public CardStatisticsResponse getCardVerificationRecords(Pageable pageable) throws RuntimeException {
+        CardStatisticsResponse cardStatisticsResponse = new CardStatisticsResponse();
+
+        Page<Map<String, Object>> page = cardVerificationRecordRepository
+                .getCardVerificationRecordByCardNumber(pageable);
+
+        if(page==null){
+            log.error("Invalid Page Exception");
+            throw  new InvalidPageException();
+        }
+
+        if(page.getSize() < 1L){
+            log.error("General Runtime Exception");
+            throw new RuntimeException();
+        }
+
+        cardStatisticsResponse.setSize(page.getNumber());
+        cardStatisticsResponse.setLimit(page.getSize());
+        cardStatisticsResponse.setSize(page.getTotalElements());
+        if(page.hasContent()){
+            cardStatisticsResponse.setSuccess(true);
+            Map<String, Object> payload = new ConcurrentHashMap<>();
+            for(Map<String, Object> item : page){
+                payload.put(String.valueOf(item.get("cardNumber")), String.valueOf(item.get("count")));
+            }
+            cardStatisticsResponse.setPayload(payload);
+        } else {
+            log.warn("No content found for the page");
+        }
+        return cardStatisticsResponse;
     }
 
 }
