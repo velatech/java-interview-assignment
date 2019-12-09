@@ -90,4 +90,32 @@ public class CardSchemeServiceImpl {
         return cardVerificationResponse;
     }
 
+
+    /**
+     * This function maps the response from the database to the response structure of the client side
+     * @param cardDetail: an object instantiated with the CardDetail class
+     * @return the mapped response
+     */
+    private CardVerificationResponse mapToCardVerificationResponse ( CardDetail cardDetail){
+        CardVerificationResponse cardVerificationResponse = new CardVerificationResponse();
+        CardVerificationPayload cardVerificationPayload = new CardVerificationPayload();
+
+        if(cardDetail != null){
+            cardVerificationResponse
+                    .getPayload()
+                    .setBank(cardDetail.getBank() == null ? "" : cardDetail.getBank());
+
+            cardVerificationResponse
+                    .getPayload()
+                    .setScheme(cardDetail.getScheme() == null ? "" : cardDetail.getScheme());
+
+            cardVerificationResponse
+                    .getPayload()
+                    .setType(cardDetail.getBrand() == null ? "" : cardDetail.getBrand());
+
+            cardVerificationResponse.setSuccess(true);
+        }
+        return cardVerificationResponse;
+    }
+
 }
