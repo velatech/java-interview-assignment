@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Repository
 public interface CardVerificationRecordRepository extends JpaRepository<CardVerificationRecord, Long> {
-    @Query("SELECT record.cardNumber AS cardNumber, COUNT(record.cardNumber) AS count FROM CardVerificationRequestRecord record GROUP BY record.cardNumber")
+    @Query("SELECT record.cardNumber AS cardNumber, COUNT(record.cardNumber) AS count FROM CardVerificationRecord record GROUP BY record.cardNumber")
     Page<Map<String, Object>> getCardVerificationRecordByCardNumber(Pageable pageable);
 
 }
