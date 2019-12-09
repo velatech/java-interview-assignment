@@ -137,4 +137,17 @@ public class CardSchemeServiceImpl {
         return cardDetail;
     }
 
+    /**
+     * This function saves card request details to the database
+     * @param cardNumber:String
+     * @param binListApiResponse: the response received from the Bin List API
+     */
+    @Async
+    @CacheEvict(value = "cache", allEntries = true)
+    public void saveRequestReturnObject(String cardNumber, BinListApiResponse binListApiResponse){
+        CardDetail cardDetail = mapToCardDetail(cardNumber, binListApiResponse);
+        cardDetailRepository.save(cardDetail);
+    }
+
+
 }
