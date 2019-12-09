@@ -1,6 +1,7 @@
 package com.velatech.java_interview_assignment.service;
 
 import com.velatech.java_interview_assignment.dto.binlist_api_response.BinListApiResponse;
+import com.velatech.java_interview_assignment.dto.customer_response.CardStatisticsResponse;
 import com.velatech.java_interview_assignment.dto.customer_response.CardVerificationPayload;
 import com.velatech.java_interview_assignment.dto.customer_response.CardVerificationResponse;
 import com.velatech.java_interview_assignment.exception.InvalidInputException;
@@ -13,13 +14,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 
 @Service
-public class CardSchemeServiceImpl {
+public class CardSchemeServiceImpl implements CardSchemeService {
     @Value("${binlist.url}")
     String binlistURL;
 
@@ -149,5 +156,42 @@ public class CardSchemeServiceImpl {
         cardDetailRepository.save(cardDetail);
     }
 
+    /**
+     * This function performs the actual verification of the card by making calls to the external API and returning appropriate responses
+     * @param cardNumber:String
+     * @param httpEntity
+     * @return the converted response after receiving response from the external API
+     * @throws HttpStatusCodeException
+     * @throws InvalidInputException
+     */
+    @Override
+    public CardVerificationResponse performCardVerification(String cardNumber, HttpEntity<?> httpEntity) throws HttpStatusCodeException, InvalidInputException {
+        String validCardNumber = validateCardNumberLength(cardNumber);
+
+        logCardVerificationRecord(validCardNumber);
+
+        Optional<CardDetail> savedResponse = cardDetailRepository.findByCardNumber(validCardNumber);
+
+        if(savedResponse.isPresent()){
+            log.info("Response had been previously saved");
+            return mapToCardVerificationResponse(savedResponse.get());
+        }
+
+        BinListApiResponse binListApiResponse = null;
+        ResponseEntity<BinListApiResponse> response = null;
+
+        try {
+            response = restTemplate.exchange( binlistURL + "/{validCard}",
+                    HttpMethod.GET, httpEntity, BinListApiResponse.class, validCardNumber);
+            binListApiResponse = response.getBody();
+        } catch (HttpStatusCodeException ex){
+            log.error("Error performing request to BinList API");
+            throw ex;
+        }
+
+        saveRequestReturnObject(validCardNumber, binListApiResponse);
+        return mapToCardVerificationResponse(binListApiResponse);
+    }
 
 }
+
