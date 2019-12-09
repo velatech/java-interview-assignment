@@ -29,7 +29,7 @@ public class CardSchemeController {
     public ResponseEntity<CardStatisticsResponse> getCardStatistics(@RequestParam("start") int start,
                                                                     @RequestParam("limit") int limit) {
         if(start < 0) throw new InvalidPageException();
-        if(start < 1) start--;
+        if(start >= 1) start--;
         return new ResponseEntity<>(cardSchemeService.getCardVerificationRecords(PageRequest.of(start, limit)), HttpStatus.OK);
     }
 }
