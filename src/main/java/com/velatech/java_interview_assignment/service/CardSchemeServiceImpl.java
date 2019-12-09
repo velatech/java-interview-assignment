@@ -86,6 +86,7 @@ public class CardSchemeServiceImpl implements CardSchemeService {
         CardVerificationPayload cardVerificationPayload = new CardVerificationPayload();
 
         if(binListApiResponse != null){
+            cardVerificationResponse.setPayload(cardVerificationPayload);
             cardVerificationResponse
                     .getPayload()
                     .setBank(binListApiResponse.getBank() == null ? "" : binListApiResponse.getBank().getName());
@@ -114,6 +115,7 @@ public class CardSchemeServiceImpl implements CardSchemeService {
         CardVerificationPayload cardVerificationPayload = new CardVerificationPayload();
 
         if(cardDetail != null){
+            cardVerificationResponse.setPayload(cardVerificationPayload);
             cardVerificationResponse
                     .getPayload()
                     .setBank(cardDetail.getBank() == null ? "" : cardDetail.getBank());
@@ -128,6 +130,7 @@ public class CardSchemeServiceImpl implements CardSchemeService {
 
             cardVerificationResponse.setSuccess(true);
         }
+        log.info(cardVerificationResponse.toString());
         return cardVerificationResponse;
     }
 
@@ -178,8 +181,11 @@ public class CardSchemeServiceImpl implements CardSchemeService {
 
         Optional<CardDetail> savedResponse = cardDetailRepository.findByCardNumber(validCardNumber);
 
+
         if(savedResponse.isPresent()){
             log.info("Response had been previously saved");
+            log.info("Hello World");
+            log.info(savedResponse.get().toString());
             return mapToCardVerificationResponse(savedResponse.get());
         }
 
@@ -225,11 +231,11 @@ public class CardSchemeServiceImpl implements CardSchemeService {
             cardStatisticsResponse.setSuccess(true);
             Map<String, Object> payload = new ConcurrentHashMap<>();
             for(Map<String, Object> item : page){
-                payload.put(String.valueOf(item.get("cardNumber")), String.valueOf(item.get("count")));
+                payload.put(String.valueOf(item.get("cardNumber")), Integer.parseInt(String.valueOf(item.get("count"))));
             }
             cardStatisticsResponse.setPayload(payload);
         } else {
-            log.warn("No content found for the page");
+            log.warn("No content found for the selected page");
         }
         return cardStatisticsResponse;
     }
