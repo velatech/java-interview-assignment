@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "https://vigilant-hoover-275feb.netlify.com")
 @RestController
 @RequestMapping("/card-scheme")
 public class CardSchemeController {
