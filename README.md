@@ -49,6 +49,8 @@ Create a repository on github for code and make frequent commit as you develop y
 The link to the user interface where these functionalities
 are to be test can be found on this [here](https://pedantic-archimedes-cb42ab.netlify.com).
 
+The github repository for the React App can be found [here](https://github.com/phayo/card-scheme-client).
+
 NB: The client is a simple react app deployed on netlify that consumes
 the Spring API and provides live demo of the REST API.
 
