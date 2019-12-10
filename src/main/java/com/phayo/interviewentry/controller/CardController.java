@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/card-scheme")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://pedantic-archimedes-cb42ab.netlify.com")
 public class CardController {
     @Autowired
     CardService cardService;
