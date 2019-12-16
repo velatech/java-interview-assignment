@@ -118,12 +118,12 @@ public class CardServiceImplTest2 {
         });
     }
 
-    @Test
-    public void returns_a_paginated_object(){
-        Map<String, Integer> map = new HashMap<>();
-        map.put("123456", 1);
-        map.put("123457", 2);
-        map.put("123458", 1);
-//        Page<?> paginatedPage = ;
-    }
+//    @Test
+//    public void returns_a_paginated_object(){
+//        Map<String, Integer> map = new HashMap<>();
+//        map.put("123456", 1);
+//        map.put("123457", 2);
+//        map.put("123458", 1);
+////        Page<?> paginatedPage = ;
+//    }
 }
