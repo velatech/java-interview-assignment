@@ -1,0 +1,8 @@
+spring.datasource.url=jdbc:mysql://localhost:3306/test_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.username=
+spring.datasource.password=
+spring.jpa.properties.hibernate.dialwct = org.hibernate.dialect.MySQL8Dialect
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+server.servlet.context-path=/api/v1
+binlist.url=https://lookup.binlist.net
