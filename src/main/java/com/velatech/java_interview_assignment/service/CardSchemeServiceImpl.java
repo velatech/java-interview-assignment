@@ -184,7 +184,6 @@ public class CardSchemeServiceImpl implements CardSchemeService {
 
         if(savedResponse.isPresent()){
             log.info("Response had been previously saved");
-            log.info("Hello World");
             log.info(savedResponse.get().toString());
             return mapToCardVerificationResponse(savedResponse.get());
         }
@@ -196,6 +195,7 @@ public class CardSchemeServiceImpl implements CardSchemeService {
             response = restTemplate.exchange( binlistURL + "/{validCard}",
                     HttpMethod.GET, httpEntity, BinListApiResponse.class, validCardNumber);
             binListApiResponse = response.getBody();
+            log.info(binListApiResponse.toString());
         } catch (HttpStatusCodeException ex){
             log.error("Error performing request to BinList API");
             throw ex;
