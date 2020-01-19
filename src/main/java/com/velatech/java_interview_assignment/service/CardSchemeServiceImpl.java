@@ -10,6 +10,7 @@ import com.velatech.java_interview_assignment.model.CardDetail;
 import com.velatech.java_interview_assignment.model.CardVerificationRecord;
 import com.velatech.java_interview_assignment.repository.CardDetailRepository;
 import com.velatech.java_interview_assignment.repository.CardVerificationRecordRepository;
+import com.velatech.java_interview_assignment.utils.CardType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +127,7 @@ public class CardSchemeServiceImpl implements CardSchemeService {
 
             cardVerificationResponse
                     .getPayload()
-                    .setType(cardDetail.getBrand() == null ? "" : cardDetail.getBrand());
+                    .setType(cardDetail.getType() == CardType.DEBIT ? "debit" : "credit");
 
             cardVerificationResponse.setSuccess(true);
         }
@@ -144,11 +145,9 @@ public class CardSchemeServiceImpl implements CardSchemeService {
 
         CardDetail cardDetail = new CardDetail();
         cardDetail.setCardNumber(cardNumber);
-        cardDetail.setCardNumberLength(binListApiResponse.getNumber() == null ? 0 : binListApiResponse.getNumber().getLength());
+        cardDetail.setType(binListApiResponse.getType().equals("debit") ? CardType.DEBIT : CardType.CREDIT );
         cardDetail.setBank(binListApiResponse.getBank() == null ? "" : binListApiResponse.getBank().getName());
-        cardDetail.setBrand(binListApiResponse.getBrand() == null ? "" : binListApiResponse.getBrand());
         cardDetail.setScheme(binListApiResponse.getScheme() == null ? "" : binListApiResponse.getScheme());
-        cardDetail.setCountry(binListApiResponse.getCountry() == null ? "" : binListApiResponse.getCountry().getName());
 
         return cardDetail;
     }
